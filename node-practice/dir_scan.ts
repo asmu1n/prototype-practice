@@ -46,7 +46,7 @@ async function scanDir(dir: string, prefix: string = '', deep: number = Number.M
         console.log(prefix + connector + label);
 
         if (isDir && deep > 0) {
-            // 子层级的前缀应该由【当前文件夹】是否为上一级的最后一个元素决定
+            // 子层级的前缀应该由【当前文件夹】是否为同级的最后一个元素决定
             const childPrefix = prefix + (currentIsLast ? '    ' : '│   ');
 
             await scanDir(path.join(dir, file.name), childPrefix, deep - 1, onCount);

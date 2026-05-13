@@ -4,7 +4,7 @@ import { stdin, stdout, exit } from 'node:process';
 import path from 'node:path';
 import readline from 'node:readline';
 
-async function DirCopy(sourcePath: string, targetPath: string) {
+async function pathCopy(sourcePath: string, targetPath: string) {
     try {
         const sourceStat = await fs.stat(sourcePath);
 
@@ -21,13 +21,13 @@ async function DirCopy(sourcePath: string, targetPath: string) {
         for (const file of allFiles) {
             const isDir = file.isDirectory();
             const fileName = file.name;
-            const filePath = `${sourcePath}/${fileName}`;
-            const targetFilePath = `${targetPath}/${fileName}`;
+            const nextSourcePath = path.join(sourcePath, fileName);
+            const nextTargetPath = path.join(targetPath, fileName);
 
             if (isDir) {
-                await DirCopy(filePath, targetFilePath);
+                await pathCopy(nextSourcePath, nextTargetPath);
             } else {
-                await copy(filePath, targetFilePath);
+                await copy(nextSourcePath, nextTargetPath);
             }
         }
     } catch (error) {
@@ -112,7 +112,7 @@ async function copy(originFilePath: string, targetFilePath: string) {
 function main() {
     const sourcePath = path.resolve('node-practice');
 
-    DirCopy(sourcePath, path.resolve('target/node-practice'));
+    pathCopy(sourcePath, path.resolve('target/node-practice'));
 }
 
 main();

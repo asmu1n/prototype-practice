@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { copyFile } from 'node:fs/promises';
-import { stdin } from 'node:process';
+import { stdin, stdout, exit } from 'node:process';
 import path from 'node:path';
 import readline from 'node:readline';
 
@@ -40,8 +40,8 @@ async function DirCopy(fileOrDirPath: string, targetFileOrDirPath: string) {
 function askUserToOverwrite(): Promise<boolean> {
     return new Promise(resolve => {
         const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
+            input: stdin,
+            output: stdout
         });
 
         // 保存原始终端设置
@@ -75,7 +75,7 @@ function askUserToOverwrite(): Promise<boolean> {
             } else if (key.ctrl && key.name === 'c') {
                 // Ctrl+C - 退出程序
                 cleanup();
-                process.exit();
+                exit();
             }
         };
 

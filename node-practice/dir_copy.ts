@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { copyFile } from 'node:fs/promises';
 import { stdin, stdout, exit } from 'node:process';
@@ -7,9 +6,9 @@ import readline from 'node:readline';
 
 async function DirCopy(fileOrDirPath: string, targetFileOrDirPath: string) {
     try {
-        const sourcePath = path.parse(fileOrDirPath);
+        const sourcePath = await fs.stat(fileOrDirPath);
 
-        const isFile = sourcePath.name !== '';
+        const isFile = sourcePath.isFile();
 
         if (isFile) {
             await copy(fileOrDirPath, targetFileOrDirPath);
@@ -37,7 +36,7 @@ async function DirCopy(fileOrDirPath: string, targetFileOrDirPath: string) {
 }
 
 // 检测用户按键，返回 true 表示覆盖，false 表示取消
-function askUserToOverwrite(): Promise<boolean> {
+function askUserToOverwrite(filePath: string): Promise<boolean> {
     return new Promise(resolve => {
         const rl = readline.createInterface({
             input: stdin,
@@ -61,7 +60,7 @@ function askUserToOverwrite(): Promise<boolean> {
             stdin.setRawMode(true);
         }
 
-        console.log('目标文件已存在，按 Enter 覆盖，按 ESC 取消');
+        console.log(`${filePath} ---目标文件已存在，按 Enter 覆盖，按 ESC 取消`);
 
         const listener = (str: string, key: readline.Key) => {
             if (key.name === 'return') {
@@ -93,12 +92,12 @@ function askUserToOverwrite(): Promise<boolean> {
 }
 
 async function copy(originFilePath: string, targetFilePath: string) {
-    const exist = existsSync(targetFilePath);
+    const exist = await fs.exists(targetFilePath);
 
     if (!exist) {
         await fs.mkdir(path.dirname(targetFilePath), { recursive: true });
     } else {
-        const shouldOverwrite = await askUserToOverwrite();
+        const shouldOverwrite = await askUserToOverwrite(targetFilePath);
 
         if (!shouldOverwrite) {
             console.log('已取消复制');
@@ -111,9 +110,9 @@ async function copy(originFilePath: string, targetFilePath: string) {
 }
 
 function main() {
-    const sourcePath = path.resolve('envConfig.ts');
+    const sourcePath = path.resolve('node-practice');
 
-    DirCopy(sourcePath, path.resolve('target/envConfig.ts'));
+    DirCopy(sourcePath, path.resolve('target/node-practice'));
 }
 
 main();

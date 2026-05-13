@@ -4,25 +4,25 @@ import { stdin, stdout, exit } from 'node:process';
 import path from 'node:path';
 import readline from 'node:readline';
 
-async function DirCopy(fileOrDirPath: string, targetFileOrDirPath: string) {
+async function DirCopy(sourcePath: string, targetPath: string) {
     try {
-        const sourcePath = await fs.stat(fileOrDirPath);
+        const sourceStat = await fs.stat(sourcePath);
 
-        const isFile = sourcePath.isFile();
+        const isFile = sourceStat.isFile();
 
         if (isFile) {
-            await copy(fileOrDirPath, targetFileOrDirPath);
+            await copy(sourcePath, targetPath);
 
             return;
         }
 
-        const allFiles = await fs.readdir(fileOrDirPath, { withFileTypes: true });
+        const allFiles = await fs.readdir(sourcePath, { withFileTypes: true });
 
         for (const file of allFiles) {
             const isDir = file.isDirectory();
             const fileName = file.name;
-            const filePath = `${fileOrDirPath}/${fileName}`;
-            const targetFilePath = `${targetFileOrDirPath}/${fileName}`;
+            const filePath = `${sourcePath}/${fileName}`;
+            const targetFilePath = `${targetPath}/${fileName}`;
 
             if (isDir) {
                 await DirCopy(filePath, targetFilePath);
